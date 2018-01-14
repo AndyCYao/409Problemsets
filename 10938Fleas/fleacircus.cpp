@@ -1,28 +1,26 @@
 #include <iostream>
 #include <vector>
+#include <queue>
 using namespace std;
 
-vector<int>nodesVector;
 vector< vector<int> > adj;
 
-void CreateAdjacencyGraph(){
-/*
-    Assumes a 
-    vector<int>nodes;
-    vector< vector<int> > adj;
-    is declared globally
-    and the input stream is formatted like this
-    E // number of edges
-    1 2 //edge(1,2)
-    2 3 //edge(2,3)
-    ..so on
-*/
+void CreateAdjacencyList(){
+    /*
+        Assumes a 
+        vector<int>nodes;
+        vector< vector<int> > adj;
+        is declared globally
+        and the input stream is formatted like this
+        E // number of edges
+        1 2 //edge(1,2)
+        2 3 //edge(2,3)
+        ..so on
+    */
     int nodes;
     cin >> nodes;
     //vector< vector<int> > adj(nodes, vector<int>(0));;
     adj.resize(nodes, vector<int>(0));
-    //adj.assign(nodes, nodesVector);
-    //adj.pushback(nodes);
 
     for(int edge = 0; edge < nodes - 1; edge++){
         int nodeA, nodeB;
@@ -34,15 +32,33 @@ void CreateAdjacencyGraph(){
     }
 }
 
+void CheckJump(int fleaA, int fleaB){
+    // do BFS from both sides
+    int INF = 100000;
+    //vector<int> distanceA(adj.size(), INF); 
+    //vector<int> distanceB(adj.size(), INF);
+    queue<int> QA ; queue<int> QB;
+    // distanceA[fleaA] = 0; distanceB[fleaB] = 0;
+    bool* hasVisitedA = new bool[adj.size()];
+    bool* hasVisitedB = new bool[adj.size()];
+    int meetingPt = -1;
+    QA.push(fleaA) ; QB.push(fleaB);
+
+    while(!QA.empty() && !QB.empty()){
+        //from the front
+
+    }
+}
+
 int main(){
     freopen("input.txt","r", stdin);
     int cases;
-    CreateAdjacencyGraph();
+    CreateAdjacencyList();
 
     cin >> cases;
     for(int x = 0; x < cases; x++){
         int fleaA, fleaB;
         cin >> fleaA >> fleaB;
-        cout << fleaA << fleaB << endl;
+        CheckJump(--fleaA,--fleaB); // our graph is 0 based
     }
 }
