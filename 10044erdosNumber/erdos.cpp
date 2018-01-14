@@ -8,16 +8,17 @@ after P lines, theres N lnes with names such as Martin, G.
 #include<string>
 #include<vector>
 #include<map>
+#include<queue>
 
 using namespace std;
 
 vector<string> authors;
 #define For(i,a,b) for(int i=a; i<b; i++)
-
-vector<string> name;
+#define INF 1000000
+vector<string> name;   
 vector<int> VectorInt;
 vector< vector<int> > adj;
-map<string, int> Index;
+map<string, int> Index; //stores int id of each author
 
 void GetAdjacencyList(int N){
     string erdos = "Erdos, P.";
@@ -41,8 +42,8 @@ void GetAdjacencyList(int N){
             while(s[k] != ',' && s[k] !=':') nm += s[k++];
 
             //at this point we have found a coauthor, in nm
-            int u =Index[nm];
-            if(u==0){
+            int u =Index[nm];   //u is the integer ID 
+            if(u==0){   //this is a new author
                 Index[nm] = ++n;
                 u = Index[nm];
                 adj.push_back(VectorInt); // create a new adjacency list for this author
@@ -60,6 +61,31 @@ void GetAdjacencyList(int N){
     }
 }
 
+/*Generate BFS tree from Erdos
+initially everyone except Erdos set to infinity, the values are stored in Index
+*/
+void BFSSearch(int author){
+    queue<int> Q;
+    vector<int> distance(name.size(), INF); // initially set to infinity
+    distance[author] = 0;
+    Q.push(author);
+
+    while(!Q.empty()){
+        int currentAuthor = Q.front(); Q.pop();
+        vector<int> coauthors = adj[currentAuthor];
+        for(vector<int>::iterator it =coauthors.begin(); it != coauthors.end(); it++){
+            if(distance[*it] == INF){   //if true this is a new author, otherwise already found
+                distance[*it] = distance[currentAuthor] + 1;
+                if(*it == 0){ //erdos id is 0
+                    cout << distance[*it] << endl; 
+                }
+            }
+            Q.push(*it);
+        }
+    }
+    cout << "infinity" << endl;
+}
+
 int main(){
     int I, N,P;
     cin >> I;
@@ -67,8 +93,16 @@ int main(){
     For(i,0,I){
         cin >> N >> P;
         GetAdjacencyList(N);
+
+        while(P--){
+            char author[100];
+            fgets(author, 100, stdin);
+            cout << author;
+            BFSSearch(Index[author] - 1);
+        }
+
+        /*
         cout << "Printing the adjacency list " << endl;
-        
         For(i,0,adj.size()){
             cout << "Reading " << i << " " << name[i] << " >>> " ;
             For(j,0,adj[i].size()){
@@ -76,5 +110,6 @@ int main(){
             }
             cout << endl;
         }
+        */
     }
 }
