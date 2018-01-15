@@ -4,6 +4,7 @@ PN
 P lines containing description of paper like Smith, M.N., Martin, G., Erdos, P.: Newtonian forms of prime factors matrices
 after P lines, theres N lnes with names such as Martin, G.
 */
+
 #include<iostream>
 #include<string>
 #include<vector>
@@ -69,7 +70,7 @@ void BFSSearch(int author){
     vector<int> distance(name.size(), INF); // initially set to infinity
     distance[author] = 0;
     Q.push(author);
-
+    cout << "Checking author " << author << endl;
     while(!Q.empty()){
         int currentAuthor = Q.front(); Q.pop();
         vector<int> coauthors = adj[currentAuthor];
@@ -87,6 +88,7 @@ void BFSSearch(int author){
 }
 
 int main(){
+    freopen("input.txt","r", stdin); // for debuggin purposes 
     int I, N,P;
     cin >> I;
     //string temp;
@@ -98,7 +100,7 @@ int main(){
             char author[100];
             fgets(author, 100, stdin);
             cout << author;
-            BFSSearch(Index[author] - 1);
+            BFSSearch(Index[author]);
         }
 
         /*
