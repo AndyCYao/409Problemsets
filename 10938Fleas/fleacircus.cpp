@@ -2,6 +2,8 @@
 #include <vector>
 #include <queue>
 #include <set>
+#include <algorithm>
+// #include <bits/std++.h>
 using namespace std;
 
 vector< vector<int> > adj;
@@ -34,57 +36,33 @@ void CreateAdjacencyList(){
 }
 
 void CheckJump(int fleaA, int fleaB){
-    // do BFS from both sides
-    queue<int> QA ; queue<int> QB;
-    //bool* hasVisitedA = new bool[adj.size()];
-    //bool* hasVisitedB = new bool[adj.size()];
-    int meetingPt = -1;
-    QA.push(fleaA) ; QB.push(fleaB);
-
-    while(!QA.empty() && !QB.empty()){ // iterate at every round 
-        //from the front
-        int nodeA = QA.front(); QA.pop();
-        set<int> currentLevelVisitedA; 
-        for(int i = 0; i < adj[nodeA].size(); i ++){
-            int neighbour = adj[nodeA][i];
-            QA.push(neighbour);
-            currentLevelVisitedA.insert(neighbour);
+    // do BFS from, find the length of the path (number of edges) from flea A to b, if the path is even number, they will meet, if the path is odd, they will jump forever. 
+    queue<int> QA ;
+    bool* hasVisitedA = new bool[adj.size()];
+    vector<int> distanceToA(adj.size(), 5001); // max N is 5000
+    QA.push(fleaA);
+    hasVisitedA[fleaA] = true; 
+    distanceToA[fleaA] = 0;
+    int level = 0;
+    while(!QA.empty()){ 
+        int currentNode = QA.front(); QA.pop();
+        for(int i = 0; i < adj[currentNode].size(); i ++){
+            int neighbour = adj[currentNode][i];
+            if(!hasVisitedA[neighbour] && distanceToA[currentNode] == 5001){
+                hasVisitedA[neighbour] = true;
+                distanceToA[currentNode] = level + 1;
+                
+                if(currentNode == fleaB){
+                    break;
+                }
+                QA.push(neighbour);
+            }
+            
         }
-
-        int nodeB = QB.front(); QB.pop();
-        set<int> currentLevelVisitedB;
-        for(int i = 0; i < adj[nodeB].size(); i ++){
-            int neighbour = adj[nodeB][i];
-            QB.push(neighbour);
-            currentLevelVisitedB.insert(neighbour);
-        }
-        
-        // every round we can have these cases
-        // case 1 - in both currentLevelVisited array there is a common node x, then we can say "The Fleas meet at x", we can do this quickly by using set intersect
-        set<int> result; 
-        set_intersection(currentLevelVisitedA.begin(), currentLevelVisitedA.end(), currentLevelVisitedB.begin(),currentLevelVisitedB.end(), 
-                         inserter(result, result.begin()));
-        if(!result.empty()){
-            set<int>:: iterator it = result.begin();
-            cout << "The fleas meet at " << (int)*it + 1 << endl ;
-            break;
-        }
-        
-        /* case 2 - using the currentLevelVisited nodes, we form pairs with their parent node, then compare the pairs to see if they have cross each other,
-            if we found such crossing we say "The fleas jump forever between 2 and 5" 
-
-            to do this, we first check if any of the currentLevelVisitedA nodes is a parent of tree B, if so identify it , using set find
-            then we check if any of the currentLevelVisitedB nodes is a parent of tree A, identify it    using set find
-
-            output The fleas jump forever between these two values.
-        */
-
-        if(currentLevelVisitedA.find(nodeB) != currentLevelVisitedA.end() && currentLevelVisitedB.find(nodeA) != currentLevelVisitedB.end()){
-            cout << "The fleas jump forever between " << nodeA + 1 << " and " << nodeB + 1 << endl; // + 1 to offset to real graphs
-            break;
-        }
-        // case 3 - proceed to next level. 
+        level ++;
     }
+
+    // calculations for even length and odd length
 }
 
 int main(){
