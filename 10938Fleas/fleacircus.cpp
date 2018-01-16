@@ -6,8 +6,10 @@
 // #include <bits/std++.h>
 using namespace std;
 
-vector< vector<int> > adj;
+//Question 10938 Flea Circus
 
+vector< vector<int> > adj;
+vector<int> parentsOfNode;
 void CreateAdjacencyList(){
     /*
         Assumes a 
@@ -35,45 +37,74 @@ void CreateAdjacencyList(){
     }
 }
 
-void CheckJump(int fleaA, int fleaB){
+void checkJump(int fleaA, int fleaB){
+    // at this point the parentOfNode is found for fleaA, and fleaB, so a path can be traced
+    //cout << "Path from " << fleaA << " to " << fleaB << "--\n";
+    vector<int> path = {fleaB};
+    //cout << fleaB << endl;
+    while(path.back() != fleaA){
+        //cout << parentsOfNode[path.back()] << endl;
+        path.push_back(parentsOfNode[path.back()]);
+    }
+    // calculations for even length and odd length
+    int meet = path.size() / 2;
+    //cout << "Meet is " << meet << endl;
+    if(path.size() % 2 != 0){
+        // the fleas meets
+        cout << "The fleas meet at " << path[meet] + 1 << endl;
+    }
+    else{
+        int small, large;
+        if (path[meet] > path[meet - 1] ) {
+            small = path[meet - 1] + 1;
+            large = path[meet] + 1;
+        }
+        else{
+            large = path[meet - 1] + 1;
+            small = path[meet] + 1;
+        }
+        cout << "The fleas jump forever between " << small  << " and " << large << endl;
+    }
+}
+
+void BFSSearch(int start, int end){
     // do BFS from, find the length of the path (number of edges) from flea A to b, if the path is even number, they will meet, if the path is odd, they will jump forever. 
     queue<int> QA ;
     bool* hasVisitedA = new bool[adj.size()];
-    vector<int> distanceToA(adj.size(), 5001); // max N is 5000
-    QA.push(fleaA);
-    hasVisitedA[fleaA] = true; 
-    distanceToA[fleaA] = 0;
-    int level = 0;
+    QA.push(start);
+    parentsOfNode.resize(adj.size(), -1);
+
     while(!QA.empty()){ 
         int currentNode = QA.front(); QA.pop();
+        if(currentNode == end){
+            checkJump(start, end); 
+            break;
+        } 
+
         for(int i = 0; i < adj[currentNode].size(); i ++){
             int neighbour = adj[currentNode][i];
-            if(!hasVisitedA[neighbour] && distanceToA[currentNode] == 5001){
-                hasVisitedA[neighbour] = true;
-                distanceToA[currentNode] = level + 1;
-                
-                if(currentNode == fleaB){
-                    break;
-                }
-                QA.push(neighbour);
-            }
             
+            if(!hasVisitedA[neighbour]){
+                hasVisitedA[neighbour] = true;
+                QA.push(neighbour);
+                parentsOfNode[neighbour] = currentNode;
+            }      
         }
-        level ++;
     }
-
-    // calculations for even length and odd length
 }
 
 int main(){
-    freopen("input.txt","r", stdin);
-    int cases;
+    //freopen("input2.txt","r", stdin);
+    
+    int tests;    
+    adj.clear();
+    parentsOfNode.clear();
     CreateAdjacencyList();
 
-    cin >> cases;
-    for(int x = 0; x < cases; x++){
+    cin >> tests;
+    for(int x = 0; x < tests; x++){
         int fleaA, fleaB;
         cin >> fleaA >> fleaB;
-        CheckJump(--fleaA,--fleaB); // our graph is 0 based
+        BFSSearch(--fleaA,--fleaB); // our graph is 0 based
     }
 }
