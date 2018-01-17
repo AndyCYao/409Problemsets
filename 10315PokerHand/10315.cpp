@@ -30,12 +30,18 @@ struct card{
         }
         suit = suits[_suit];
     }
+    //used to compare two cards by value
+    //https://stackoverflow.com/questions/4892680/sorting-a-vector-of-structs
+    bool operator<(const card& c2) const{
+        return val < c2.val;
+    }
 };
+
 
 struct hand{
     vector<card> cards;    
     //stores hands from strongest to weakest in integer topHand;
-    int* topHand[10];
+    unsigned short int handValue;
     int topNumber; // if both hands have same topHand, then the topNumber will decide
 };
 
@@ -50,7 +56,14 @@ bool hasFlush(hand* hand){
 }
 
 bool hasStraight(hand* hand){
-    
+    vector<card> tmp = hand ->cards;
+    sort(tmp.begin(), tmp.end());
+    int sum = tmp[4].val + tmp[0].val ;
+    if(tmp[3].val + tmp[1].val == sum && tmp[2].val == sum/2) {
+        hand ->topNumber = tmp[4].val; // the last card is the high card of the straight
+        return true;
+    }
+    hand ->topNumber = tmp[4].val; // the last card is the high card of the straight, define it for high card later on
     return false;
 }
 
@@ -74,7 +87,8 @@ bool hasFourKind(hand* hand){
 
 int numberOfPairs(hand* hand){
     // get number of pairs 
-    unordered_map<int, int> countOfPairs;
+    //unordered_map<int, int> countOfPairs;
+    int countOfPairs[15] = {0};
     //int maxDifference = 2;
     int numPairs = 0;
     for(int x = 0; x < hand -> cards.size(); x++){
@@ -114,23 +128,32 @@ void checkBestHand(hand* hand){
     int pairs       = numberOfPairs(hand);
     // from strongest hand to weakest
     if(isStraight && isFlush){
-        cout << "straight flush" << endl;
+        cout << "straight flush of " << hand->topNumber << endl;
+        hand->handValue = (1 << 9);
     }else if(is4Kind){
-        cout << "4 kind " << endl;
+        cout << "4 kind " << hand->topNumber << endl;
+        hand->handValue = (1 << 8);
     }else if(isTriple && pairs == 2){
-        cout << "full house " << endl;
+        cout << "full house " << hand->topNumber << endl;
+        hand->handValue = (1 << 7);
     }else if(isFlush){
         cout << "flush" << endl;
+        hand->handValue = (1 << 6);
     }else if(isStraight){
-        cout << "straight" << endl;
+        cout << "straight" << hand->topNumber << endl;
+        hand->handValue = (1 << 5);
     }else if(isTriple){
-        cout << "3Kind" << endl;
+        cout << "3Kind" << hand->topNumber << endl;
+        hand->handValue = (1 << 4);
     }else if(pairs == 2){
-        cout << "2 pairs" << endl;
+        cout << "2 pairs" << hand->topNumber << endl;
+        hand->handValue = (1 << 3);
     }else if(pairs == 1){
-        cout << "pair" << endl;
+        cout << "pair" << hand->topNumber << endl;
+        hand->handValue = (1 << 2);
     }else{
-        cout << "high card" << endl;
+        cout << "high card" << hand->topNumber << endl;
+        hand->handValue = (1 << 1);
     }
 }
 
@@ -157,6 +180,15 @@ int main(){
         checkBestHand(&black);
         cout << "white has ... " ;
         checkBestHand(&white);
+        if(black.handValue > white.handValue){
+            printf("Black wins.\n");
+        }else if(black.handValue < white.handValue){
+            printf("White wins.\n");
+        }else if(black.topNumber > white.topNumber){
+            printf("Black wins.\n");
+        }else{
+            printf("White wins.\n");
+        }
     }
     return 0;
 }
