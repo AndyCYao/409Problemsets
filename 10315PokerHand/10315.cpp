@@ -3,7 +3,15 @@
 #include<sstream>
 #include<unordered_map>
 #include<string>
+#include<bitset>
+#include<algorithm>
 using namespace std;
+
+#ifdef DEBUG // turn on by g++ -std=c++11  -g  10315.cpp -o 10315 -DDEBUG
+#define Debug(x) std::cout << x 
+#else
+#define Debug(x)
+#endif
 
 unordered_map<char, int> suits = {
     {'C',0},
@@ -25,7 +33,10 @@ struct card{
             val = 13;
         }else if(_val == "A") {
             val = 14;
-        }else{
+        }else if(_val == "T"){
+            val = 10;
+        }
+        else{
             val = stoi(_val);
         }
         suit = suits[_suit];
@@ -37,13 +48,22 @@ struct card{
     }
 };
 
+const int MAXBIT = 40; // size of the bitset.
 
 struct hand{
     vector<card> cards;    
     //stores hands from strongest to weakest in integer topHand;
-    unsigned short int handValue;
-    int topNumber; // if both hands have same topHand, then the topNumber will decide
+    //unsigned long long handValue;
+    bitset<MAXBIT> handValue;
+    //int topNumber; // if both hands have same topHand, then the topNumber will decide
 };
+
+void setHighCardBit(hand* hand, int val){
+    // this function is used by hasFourKind and hasTriple and has Full House. Because these hands are ranked by their 4s, and 3s respectively
+    // at this point, the hand might have bits activate in the pairs range (between 13-25), this function will clear it, and set this instead. 
+    for(int i = 13; i<26; i++) hand->handValue.reset(i); 
+    hand->handValue.set(val+13); 
+}
 
 bool hasFlush(hand* hand){
     int currentSuit = hand -> cards[0].suit;
@@ -58,13 +78,13 @@ bool hasFlush(hand* hand){
 bool hasStraight(hand* hand){
     vector<card> tmp = hand ->cards;
     sort(tmp.begin(), tmp.end());
-    int sum = tmp[4].val + tmp[0].val ;
-    if(tmp[3].val + tmp[1].val == sum && tmp[2].val == sum/2) {
-        hand ->topNumber = tmp[4].val; // the last card is the high card of the straight
-        return true;
+    for(int i = 1;i<tmp.size();i++){
+        if(tmp[i].val - tmp[i-1].val != 1){
+            return false;
+        }
     }
-    hand ->topNumber = tmp[4].val; // the last card is the high card of the straight, define it for high card later on
-    return false;
+    //hand ->topNumber = tmp[4].val; // the last card is the high card of the straight, define it for high card later on
+    return true;
 }
 
 bool hasFourKind(hand* hand){
@@ -78,7 +98,8 @@ bool hasFourKind(hand* hand){
         }
         countOfFour[val] ++;
         if(countOfFour[val] == 4){
-            hand -> topNumber = hand->cards[x].val;
+            setHighCardBit(hand, val);
+            //hand -> topNumber = hand->cards[x].val;
             return true;
         }
     }
@@ -94,6 +115,7 @@ int numberOfPairs(hand* hand){
     for(int x = 0; x < hand -> cards.size(); x++){
         int val = hand -> cards[x].val;
         if(countOfPairs[val] == 1){
+            hand->handValue.set(val+13); // the pair bits have to increment 
             numPairs ++;
         }
         countOfPairs[val] ++;
@@ -112,7 +134,8 @@ bool hasTriples(hand* hand){
         }        
         countOfTrips[val] ++;
         if(countOfTrips[val] == 3){
-            hand -> topNumber = hand->cards[x].val;
+            //hand -> topNumber = hand->cards[x].val;
+            setHighCardBit(hand, val);
             return true;
         }
     }
@@ -128,32 +151,32 @@ void checkBestHand(hand* hand){
     int pairs       = numberOfPairs(hand);
     // from strongest hand to weakest
     if(isStraight && isFlush){
-        cout << "straight flush of " << hand->topNumber << endl;
-        hand->handValue = (1 << 9);
+        Debug("straight flush of " << endl);
+        hand->handValue.set(MAXBIT-1);
     }else if(is4Kind){
-        cout << "4 kind " << hand->topNumber << endl;
-        hand->handValue = (1 << 8);
+        Debug("4 kind " << endl);
+        hand->handValue.set(MAXBIT-2);
     }else if(isTriple && pairs == 2){
-        cout << "full house " << hand->topNumber << endl;
-        hand->handValue = (1 << 7);
+        Debug("full house " << endl);
+        hand->handValue.set(MAXBIT-3);
     }else if(isFlush){
-        cout << "flush" << endl;
-        hand->handValue = (1 << 6);
+        Debug("flush" << endl);
+        hand->handValue.set(MAXBIT-4);
     }else if(isStraight){
-        cout << "straight" << hand->topNumber << endl;
-        hand->handValue = (1 << 5);
+        Debug("straight" << endl);
+        hand->handValue.set(MAXBIT-5);
     }else if(isTriple){
-        cout << "3Kind" << hand->topNumber << endl;
-        hand->handValue = (1 << 4);
+        Debug("3Kind" << endl);
+        hand->handValue.set(MAXBIT-6);
     }else if(pairs == 2){
-        cout << "2 pairs" << hand->topNumber << endl;
-        hand->handValue = (1 << 3);
+        Debug("2 pairs" << endl);
+        hand->handValue.set(MAXBIT-7);
     }else if(pairs == 1){
-        cout << "pair" << hand->topNumber << endl;
-        hand->handValue = (1 << 2);
+        Debug("pair" << endl);
+        hand->handValue.set(MAXBIT-8);
     }else{
-        cout << "high card" << hand->topNumber << endl;
-        hand->handValue = (1 << 1);
+        Debug("high card" << endl);
+        hand->handValue.set(MAXBIT-9);
     }
 }
 
@@ -170,24 +193,26 @@ int main(){
             getline(ss, substring, ' ');
             card newCard(substring.substr(0, substring.size()-1), substring.back());
             black.cards.push_back(newCard);
+            black.handValue.set(newCard.val); // activate the bit on the card value 
         }
-        for(int i = 0; i<5; i++){
+        for(int i = 0; i<5; i++){   // same for the white hand.
             getline(ss, substring, ' ');
             card newCard(substring.substr(0, substring.size()-1), substring.back());
-            white.cards.push_back(newCard);            
+            white.cards.push_back(newCard); 
+            white.handValue.set(newCard.val); // activate the bit on the card value           
         }
-        cout << "black has ... " ;
+        Debug("black has ... ");
         checkBestHand(&black);
-        cout << "white has ... " ;
+        Debug("white has ... ");
         checkBestHand(&white);
-        if(black.handValue > white.handValue){
-            printf("Black wins.\n");
-        }else if(black.handValue < white.handValue){
-            printf("White wins.\n");
-        }else if(black.topNumber > white.topNumber){
-            printf("Black wins.\n");
+        unsigned long long blackValue = (long long)(black.handValue.to_ulong());
+        unsigned long long whiteValue = (long long)(white.handValue.to_ulong());
+        if(blackValue > whiteValue){
+            puts("Black wins.");
+        }else if(blackValue < whiteValue){
+            puts("White wins.");
         }else{
-            printf("White wins.\n");
+            puts("Tie.");
         }
     }
     return 0;
