@@ -23,21 +23,20 @@ unordered_map<char, int> suits = {
 struct card{
     int val;
     int suit;
-    card(string _val, char _suit){
+    card(char _val, char _suit){
         //cout << "reading in " << _val << " and " << _suit << endl;
-        if(_val == "J"){
+        if(_val == 'J'){
             val = 11;
-        }else if(_val == "Q"){
+        }else if(_val == 'Q'){
             val = 12;
-        }else if(_val == "K") {
+        }else if(_val == 'K') {
             val = 13;
-        }else if(_val == "A") {
+        }else if(_val == 'A') {
             val = 14;
-        }else if(_val == "T"){
+        }else if(_val == 'T'){
             val = 10;
-        }
-        else{
-            val = stoi(_val);
+        }else{
+            val = (_val - '0');
         }
         suit = suits[_suit];
     }
@@ -52,17 +51,18 @@ const int MAXBIT = 40; // size of the bitset.
 
 struct hand{
     vector<card> cards;    
-    //stores hands from strongest to weakest in integer topHand;
-    //unsigned long long handValue;
     bitset<MAXBIT> handValue;
-    //int topNumber; // if both hands have same topHand, then the topNumber will decide
-};
+ };
 
 void setHighCardBit(hand* hand, int val){
     // this function is used by hasFourKind and hasTriple and has Full House. Because these hands are ranked by their 4s, and 3s respectively
     // at this point, the hand might have bits activate in the pairs range (between 13-25), this function will clear it, and set this instead. 
     for(int i = 13; i<26; i++) hand->handValue.reset(i); 
     hand->handValue.set(val+13); 
+}
+
+void clearAllBit(hand* hand, int start, int end){
+    for (int i = start; i<end; i++) hand->handValue.reset(i);
 }
 
 bool hasFlush(hand* hand){
@@ -98,6 +98,7 @@ bool hasFourKind(hand* hand){
         }
         countOfFour[val] ++;
         if(countOfFour[val] == 4){
+            clearAllBit(hand, 0, 13); //clear all high card bits
             setHighCardBit(hand, val);
             //hand -> topNumber = hand->cards[x].val;
             return true;
@@ -135,6 +136,7 @@ bool hasTriples(hand* hand){
         countOfTrips[val] ++;
         if(countOfTrips[val] == 3){
             //hand -> topNumber = hand->cards[x].val;
+            clearAllBit(hand, 0, 13); //clear all high card bits
             setHighCardBit(hand, val);
             return true;
         }
@@ -144,27 +146,37 @@ bool hasTriples(hand* hand){
 
 void checkBestHand(hand* hand){
     /**/
-    bool is4Kind    = hasFourKind(hand);
     bool isFlush    = hasFlush(hand);
-    bool isTriple   = hasTriples(hand);
     bool isStraight = hasStraight(hand);
-    int pairs       = numberOfPairs(hand);
+
     // from strongest hand to weakest
     if(isStraight && isFlush){
-        Debug("straight flush of " << endl);
+        //Debug("straight flush of " << endl);
         hand->handValue.set(MAXBIT-1);
-    }else if(is4Kind){
+        return;
+    }else if(isFlush){
+        Debug("flush" << endl);
+        clearAllBit(hand, 13, 26); // only using high card rule
+        hand->handValue.set(MAXBIT-4);
+        return;
+    }else if(isStraight){
+        Debug("straight" << endl);
+        hand->handValue.set(MAXBIT-5);
+        return;
+    }
+    
+    // isTriple, is4Kind and numberofPairs set the bits within the function
+    // thats why we have to break them out from the earlier three functions. 
+    int pairs       = numberOfPairs(hand);  
+    bool isTriple   = hasTriples(hand);  
+    bool is4Kind    = hasFourKind(hand);
+    if(is4Kind){
         Debug("4 kind " << endl);
         hand->handValue.set(MAXBIT-2);
     }else if(isTriple && pairs == 2){
         Debug("full house " << endl);
+        clearAllBit(hand, 0, 13); // clear highcard bits, keep the triple bits;
         hand->handValue.set(MAXBIT-3);
-    }else if(isFlush){
-        Debug("flush" << endl);
-        hand->handValue.set(MAXBIT-4);
-    }else if(isStraight){
-        Debug("straight" << endl);
-        hand->handValue.set(MAXBIT-5);
     }else if(isTriple){
         Debug("3Kind" << endl);
         hand->handValue.set(MAXBIT-6);
@@ -181,7 +193,7 @@ void checkBestHand(hand* hand){
 }
 
 int main(){
-    freopen("input.txt","r", stdin);
+    //freopen("input.txt","r", stdin);
     string str;
     while(getline(cin, str) && str.length() > 0){
     
@@ -191,13 +203,13 @@ int main(){
         hand black, white;
         for(int i = 0; i < 5; i++){
             getline(ss, substring, ' ');
-            card newCard(substring.substr(0, substring.size()-1), substring.back());
+            card newCard(substring.front(), substring.back());
             black.cards.push_back(newCard);
             black.handValue.set(newCard.val); // activate the bit on the card value 
         }
         for(int i = 0; i<5; i++){   // same for the white hand.
             getline(ss, substring, ' ');
-            card newCard(substring.substr(0, substring.size()-1), substring.back());
+            card newCard(substring.front(), substring.back());
             white.cards.push_back(newCard); 
             white.handValue.set(newCard.val); // activate the bit on the card value           
         }
