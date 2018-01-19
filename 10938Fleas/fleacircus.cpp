@@ -32,15 +32,12 @@ void CreateAdjacencyList(int nodes){
         nodeA --; nodeB --; //our graph is zero based
         adj[nodeA].push_back(nodeB);
         adj[nodeB].push_back(nodeA);
-        //cout << nodeA << nodeB << endl;
     }
 }
 
 void solve(int fleaA, int fleaB){
     // at this point the parentOfNode is found for fleaA, and fleaB, so a path can be traced
-    //cout << "Path from " << fleaA << " to " << fleaB << "--\n";
     vector<int> path = {fleaB};
-    //cout << fleaB << endl;
     while(path.back() != fleaA){
         //cout << parentsOfNode[path.back()] << endl;
         path.push_back(parentsOfNode[path.back()]);
@@ -56,7 +53,6 @@ void solve(int fleaA, int fleaB){
         small = path[meet - 1] + 1;
         large = path[meet] + 1;
         if(small > large) swap(small, large);
-        //cout << "The fleas jump forever between " << small  << " and " << large << "." << endl;
         printf("The fleas jump forever between %d and %d.\n", small, large);
     }
 }
@@ -64,7 +60,9 @@ void solve(int fleaA, int fleaB){
 void BFSSearch(int start, int end){
     // do BFS from, find the length of the path (number of edges) from flea A to b, if the path is even number, they will meet, if the path is odd, they will jump forever.
     queue<int> QA;
-    bool *hasVisitedA = new bool[adj.size()];
+    //bool *hasVisitedA = new bool[adj.size()];
+    vector<bool> hasVisited(adj.size(),false);
+    hasVisited[start] = 1;
     QA.push(start);
     parentsOfNode.clear();
     parentsOfNode.resize(adj.size(), -1);
@@ -82,33 +80,12 @@ void BFSSearch(int start, int end){
         {
             int neighbour = adj[currentNode][i];
 
-            if (!hasVisitedA[neighbour])
+            if (hasVisited[neighbour]==0)
             {
-                hasVisitedA[neighbour] = true;
+                hasVisited[neighbour] = 1;
                 QA.push(neighbour);
                 parentsOfNode[neighbour] = currentNode;
             }
-        }
-    }
-    delete[] hasVisitedA;
-}
-
-void runner(int nodes){
-    int tests;
-    //cin >> nodes;
-    adj.clear();
-    parentsOfNode.clear();
-    CreateAdjacencyList(nodes);
-    cin >> tests;   
-    for (int x = 0; x < tests; x++)
-    {
-        int fleaA, fleaB;
-        cin >> fleaA >> fleaB;
-        if(fleaA == fleaB){
-            printf("The fleas meet at %d.\n", fleaA);
-        }
-        else{
-            BFSSearch(--fleaA, --fleaB); // our graph is 0 based
         }
     }
 }
@@ -118,7 +95,25 @@ int main(){
     //freopen("output.txt","w", stdout);
     int n;
     while(scanf("%d", &n) && n){
-        runner(n);
+        //cin >> nodes;
+        adj.clear();
+        parentsOfNode.clear();
+        CreateAdjacencyList(n);
+
+        int tests;
+        cin >> tests;   
+        for (int x = 0; x < tests; x++)
+        {
+            int fleaA, fleaB;
+            cin >> fleaA >> fleaB;
+            //printf("checking %d %d - \n", fleaA - 1, fleaB - 1);
+            if(fleaA == fleaB){
+                printf("The fleas meet at %d.\n", fleaA);
+            }
+            else{
+                BFSSearch(--fleaA, --fleaB); // our graph is 0 based
+            }
+        }
     }
     return 0;
 }
