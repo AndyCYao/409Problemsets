@@ -7,9 +7,11 @@ after P lines, theres N lnes with names such as Martin, G.
 
 #include<iostream>
 #include<string>
+#include<cstring>
 #include<vector>
 #include<map>
 #include<queue>
+
 
 using namespace std;
 
@@ -21,7 +23,7 @@ vector<int> VectorInt;
 vector< vector<int> > adj;
 map<string, int> Index; //stores int id of each author
 
-vector<int> distance; // distance to Erdos
+vector<int> distanceToErdos; // distanceToErdos to Erdos
 
 void GetAdjacencyList(int N){
     string erdos = "Erdos, P.";
@@ -34,7 +36,8 @@ void GetAdjacencyList(int N){
     fgets(s, 10000, stdin); // fgets grabs a line from stdin
     while (N--){
         fgets(s, 10000, stdin);
-        int len = strlen(s), k = 0; //get the author/paper's row length
+        int len = strlen(s);
+        int k = 0; //get the author/paper's row length
         vector<int> list; 
         while(k<len){
             nm = ""; // name of the author
@@ -70,55 +73,50 @@ void GetAdjacencyList(int N){
 /*Generate BFS tree from Erdos
 initially everyone except Erdos set to infinity, the values are stored in Index
 */
-void BFSSearch(int author){
+void BFSSearch(){
     queue<int> Q;
-    vector<int> distance(name.size(), INF); // initially set to infinity
-    distance[author] = 0;
-    Q.push(author);
-    cout << "Checking author " << author << endl;
+    distanceToErdos.clear();
+    distanceToErdos.resize(name.size(), INF);
+    distanceToErdos[0] = 0;
+    Q.push(0); // 0 is erdos.
+
     while(!Q.empty()){
         int currentAuthor = Q.front(); Q.pop();
         vector<int> coauthors = adj[currentAuthor];
         for(vector<int>::iterator it =coauthors.begin(); it != coauthors.end(); it++){
-            if(distance[*it] == INF){   //if true this is a new author, otherwise already found
-                distance[*it] = distance[currentAuthor] + 1;
-                if(*it == 0){ //erdos id is 0
-                    cout << distance[*it] << endl; 
-                }
+            if(distanceToErdos[*it] == INF){   //if true this is a new author, otherwise already found
+                distanceToErdos[*it] = distanceToErdos[currentAuthor] + 1;
+                Q.push(*it);
             }
-            Q.push(*it);
         }
     }
-    cout << "infinity" << endl;
 }
 
 int main(){
-    freopen("input.txt","r", stdin); // for debuggin purposes 
+    //freopen("input.txt","r", stdin); // for debuggin purposes 
     int I, N,P;
     cin >> I;
     //string temp;
     For(i,0,I){
+        printf("Scenario %i\n", i+1);
         cin >> N >> P;
         GetAdjacencyList(N);
 
         BFSSearch();
 
         while(P--){
-            char author[100];
-            fgets(author, 100, stdin);
-            cout << author;
-            
-        }
-
-        /*
-        cout << "Printing the adjacency list " << endl;
-        For(i,0,adj.size()){
-            cout << "Reading " << i << " " << name[i] << " >>> " ;
-            For(j,0,adj[i].size()){
-                cout << "\t" <<adj[i][j] << " " << name[adj[i][j]] ;
+            //char author[100];
+            string author;
+            getline(cin, author);
+            int authorId = Index[author] - 1;
+            int distance = distanceToErdos[authorId];
+            printf("%s ", author.c_str());
+            if(authorId == -1){
+                cout << "infinity\n";
             }
-            cout << endl;
+            else{
+                (distance == INF) ? cout << "infinity\n" : cout << distance << endl;
+            }
         }
-        */
     }
 }
