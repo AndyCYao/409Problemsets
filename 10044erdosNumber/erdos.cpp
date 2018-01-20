@@ -21,11 +21,13 @@ vector<int> VectorInt;
 vector< vector<int> > adj;
 map<string, int> Index; //stores int id of each author
 
+vector<int> distance; // distance to Erdos
+
 void GetAdjacencyList(int N){
     string erdos = "Erdos, P.";
     name.clear();  name.push_back(erdos);
     adj.clear();   adj.push_back(VectorInt);
-    Index.clear(); Index[erdos] = 1; //the distance to distance to himself is 1. 
+    Index.clear(); Index[erdos] = 1; 
 
     int n = 1;
     char s[10000]; string nm;
@@ -41,6 +43,9 @@ void GetAdjacencyList(int N){
             while(s[k] != ',') nm += s[k++];
             nm += s[k++];
             while(s[k] != ',' && s[k] !=':') nm += s[k++];
+
+            //remove space from beginning if exist
+            if(nm[0] == ' ') nm.erase(nm.begin());
 
             //at this point we have found a coauthor, in nm
             int u =Index[nm];   //u is the integer ID 
@@ -96,11 +101,13 @@ int main(){
         cin >> N >> P;
         GetAdjacencyList(N);
 
+        BFSSearch();
+
         while(P--){
             char author[100];
             fgets(author, 100, stdin);
             cout << author;
-            BFSSearch(Index[author]);
+            
         }
 
         /*
