@@ -151,7 +151,7 @@ void checkBestHand(hand* hand){
 
     // from strongest hand to weakest
     if(isStraight && isFlush){
-        //Debug("straight flush of " << endl);
+        Debug("straight flush of " << endl);
         hand->handValue.set(MAXBIT-1);
         return;
     }else if(isFlush){
