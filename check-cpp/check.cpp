@@ -6,15 +6,18 @@ using namespace std;
 #define REP(i, a, b) for (int i = a; i < b; i++)
 
 int game = 1;
+// int curr = 900;
 
 void pres(char a)
 {
+    // if (game == curr){ // TODO remove (debug)
     if (a == 'w')
         cout << "Game #" << game << ": white king is in check.\n";
     else if (a == 'b')
         cout << "Game #" << game << ": black king is in check.\n";
     else
         cout << "Game #" << game << ": no king is in check.\n";
+    // }
 }
 
 bool horiz(int ki, int kj, string *board, char type)
@@ -59,7 +62,7 @@ bool horiz(int ki, int kj, string *board, char type)
         }
     }
 
-    REP(i, 0, ki)
+    for (int i = ki; i >= 0; i--)
     {
         char c = board[i][kj];
         // cout << c;
@@ -72,7 +75,7 @@ bool horiz(int ki, int kj, string *board, char type)
         }
     }
 
-    REP(j, 0, kj)
+    for (int j = kj; j >= 0; j--)
     {
         char c = board[ki][j];
         // cout << board[ki][j];
@@ -97,8 +100,12 @@ bool pawn(int ki, int kj, string *board, char type)
 
     if (ki > 0 && ki < 7 && kj > 0 && kj < 7)
     {
-        return ((board[ki - 1][kj - 1] == p) || (board[ki + 1][kj + 1] == p) ||
-                (board[ki + 1][kj - 1] == p) || (board[ki - 1][kj + 1] == p));
+        if (type == 'w') {
+            return (board[ki - 1][kj - 1] == p) || (board[ki - 1][kj + 1] == p);
+        }
+        else if (type == 'b'){
+            return (board[ki + 1][kj + 1] == p) || (board[ki + 1][kj - 1] == p); 
+        }
     }
     else
         return false;
@@ -106,11 +113,41 @@ bool pawn(int ki, int kj, string *board, char type)
 
 bool knight(int ki, int kj, string *board, char type)
 {
-    char n;
+    char n, k;
     if (type == 'w')
+    {
         n = 'n';
+        k = 'K';
+    }
     else if (type == 'b')
+    {
         n = 'N';
+        k = 'k';
+    }
+
+    REP(x, 0, 8)
+    {
+        REP(y, 0, 8)
+        {
+            // from https://fabhodev.wordpress.com/2013/12/06/10196-check-the-check-uva-solution/
+            if (board[x][y] == n && x - 2 >= 0 && y - 1 >= 0 && board[x - 2][y - 1] == k)
+                return true;
+            else if (board[x][y] == n && x - 1 >= 0 && y - 2 >= 0 && board[x - 1][y - 2] == k)
+                return true;
+            else if (board[x][y] == n && x + 1 < 8 && y - 2 >= 0 && board[x + 1][y - 2] == k)
+                return true;
+            else if (board[x][y] == n && x + 2 < 8 && y - 1 >= 0 && board[x + 2][y - 1] == k)
+                return true;
+            else if (board[x][y] == n && x + 2 < 8 && y + 1 < 8 && board[x + 2][y + 1] == k)
+                return true;
+            else if (board[x][y] == n && x + 1 < 8 && y + 2 < 8 && board[x + 1][y + 2] == k)
+                return true;
+            else if (board[x][y] == n && x - 1 >= 0 && y + 2 < 8 && board[x - 1][y + 2] == k)
+                return true;
+            else if (board[x][y] == n && x - 2 >= 0 && y + 1 < 8 && board[x - 2][y + 1] == k)
+                return true;
+        }
+    }
 
     if (ki > 1 && ki < 6 && kj > 0 && kj < 7)
     {
@@ -124,7 +161,7 @@ bool knight(int ki, int kj, string *board, char type)
             return true;
     }
 
-    if (ki > 0 && ki < 7 && kj > 1 && ki < 6)
+    if (ki > 0 && ki < 7 && kj > 1 && kj < 6)
     {
         if (board[ki + 1][kj - 2] == n)
             return true;
@@ -139,20 +176,19 @@ bool knight(int ki, int kj, string *board, char type)
     return false;
 }
 
-// TODO step logic is wrong
 bool diag(int ki, int kj, string *board, char type)
 {
-    char b, q, k;
+    char t, q, k;
     if (type == 'w')
     {
         q = 'q';
-        b = 'b';
+        t = 'b';
         k = 'K';
     }
     else if (type == 'b')
     {
         q = 'Q';
-        b = 'B';
+        t = 'B';
         k = 'k';
     }
     // ok 2
@@ -161,7 +197,7 @@ bool diag(int ki, int kj, string *board, char type)
         char c = board[a][b];
         if (c != '.' && c != k)
         {
-            if (c == b || c == q)
+            if (c == t || c == q)
                 return true;
             else
                 break;
@@ -169,12 +205,12 @@ bool diag(int ki, int kj, string *board, char type)
     }
 
     // ok 1
-    for (int a = 0, b = 0; a < ki && b < kj; a++, b++)
+    for (int a = ki, b = kj; a > -1 && b < 8; a--, b++)
     {
         char c = board[a][b];
         if (c != '.' && c != k)
         {
-            if (c == b || c == q)
+            if (c == t || c == q)
                 return true;
             else
                 break;
@@ -182,12 +218,12 @@ bool diag(int ki, int kj, string *board, char type)
     }
 
     //ok 3
-    for (int a = ki, b = 7; a < 8 && b > kj; a++, b--)
+    for (int a = ki, b = kj; a < 8 && b > -1; a++, b--)
     {
         char c = board[a][b];
         if (c != '.' && c != k)
         {
-            if (c == b || c == q)
+            if (c == t || c == q)
                 return true;
             else
                 break;
@@ -195,12 +231,12 @@ bool diag(int ki, int kj, string *board, char type)
     }
 
     // ok 4
-    for (int a = 0, b = 7; a < ki && b > kj; a++, b--)
+    for (int a = ki, b = kj; a > -1 && b > -1; a--, b--)
     {
         char c = board[a][b];
         if (c != '.' && c != k)
         {
-            if (c == b || c == q)
+            if (c == t || c == q)
                 return true;
             else
                 break;
@@ -263,7 +299,7 @@ bool check_black(int bki, int bkj, string *board)
 int main()
 {
     // freopen("Check-the-Check_in.txt", "r", stdin);
-    // freopen("in.txt", "r", stdin);
+    // freopen("test.txt", "r", stdin);
 
     do
     {
@@ -311,10 +347,21 @@ int main()
         if (!check_white(wki, wkj, board) && !check_black(bki, bkj, board))
             pres('f');
 
+        // if (game == curr){ // TODO remove (debug)
+        //     REP(i, 0, 8)
+        //     {
+        //         REP(j, 0, 8)
+        //         {
+        //             cout << board[i][j];
+        //         }
+        //         cout << endl;
+        //     }
+        // }
+
         game++; // on to the next game
     } while (1);
 
-    fclose(stdin);
+    // fclose(stdin);
 
     return 0;
 }
