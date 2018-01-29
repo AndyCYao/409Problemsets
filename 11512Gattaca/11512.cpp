@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <algorithm>
 
 using namespace std;
 
@@ -29,17 +30,43 @@ struct SuffixArray{
     vector<int> GetSuffixArray() {return P.back();}
 };
 
-void getLCS(){
-    SuffixArray sfx("bobocel");
+void getLCS(string s){
+    SuffixArray sfx(s);
     sufArr = sfx.GetSuffixArray();
-    //sort(sufArr.begin(), sufArr.end());
-    int max = 0;
-    for(int i = 1; i < sufArr.size(); i ++ ){
-        string a(sfx.s.substr(i-1));
-        cout << a << endl;
+    int size = sufArr.size();
+    vector<int> inverted_sufArr(size);
+    for(int i = 0; i < size; i ++ ) inverted_sufArr[sufArr[i]] = i;
+
+    int maxOverAll = 0;
+    string maxString = "No repetitions found!";
+    for(vector<int>::iterator it = inverted_sufArr.begin() + 1; it != inverted_sufArr.end(); it ++){
+        // compare prefixes against previous
+        int maxPrefix = 0;
+        string commonPrefix;
+        vector<int>::iterator prev_it = it - 1;
+        string previousStr(sfx.s.substr(*prev_it));
+        string currentStr(sfx.s.substr(*it));
+        int y = 0;
+        while(previousStr[y] == currentStr[y]){
+            commonPrefix.push_back(currentStr[y]);
+            y++; maxPrefix++;
+        }
+        if(maxOverAll < maxPrefix){
+            maxOverAll = maxPrefix;
+            maxString.assign(commonPrefix);
+        }
     }
+    printf("%s %d\n", maxString.c_str(), maxOverAll);
 }
 
 int main(){
-    getLCS();
+    freopen("input.in", "r", stdin);
+    int n;
+    cin >> n;
+    string line;
+    
+    while(n && n--){
+        cin >> line;
+        getLCS(line);
+    }
 }
