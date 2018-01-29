@@ -30,6 +30,36 @@ struct SuffixArray{
     vector<int> GetSuffixArray() {return P.back();}
 };
 
+// this is the failure function, need to be precompiled
+void buildPi(string& p, vector<int>& pi){
+    pi = vector<int>(p.length());
+    int k = -2;
+    for(int i=0; i<p.length(); i++){
+        while(k>= -1 && p[k+1] != p[i]){
+            k = (k == -1) ? -2 : pi[k];
+        }
+         pi[i] = ++k;
+    }
+}
+
+int KMP(string& t, string& p){
+    int count = 0;
+    vector<int> pi;
+    buildPi(p,pi);
+    int k = -1;
+    for(int i = 0; i < t.length(); i++){
+        while( k >= -1 && p[k+1] != t[i]){
+            k = (k == -1) ? -2 : pi[k];
+        }
+        k++;
+        if(k == p.length() - 1){
+            count ++;
+            k = (k == -1) ? -2 : pi[k];
+        }
+    }
+    return count;
+}
+
 void getLCS(string s){
     SuffixArray sfx(s);
     sufArr = sfx.GetSuffixArray();
@@ -56,7 +86,12 @@ void getLCS(string s){
             maxString.assign(commonPrefix);
         }
     }
-    printf("%s %d\n", maxString.c_str(), maxOverAll);
+    if(maxOverAll == 0){
+        printf("%s", maxString.c_str());    
+    }else{
+        int count = KMP(s, maxString);
+        printf("%s %d\n", maxString.c_str(), count);
+    }
 }
 
 int main(){
