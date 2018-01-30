@@ -87,7 +87,7 @@ void getLCS(string s){
         }
     }
     if(maxOverAll == 0){
-        printf("%s", maxString.c_str());    
+        printf("%s\n", maxString.c_str());    
     }else{
         int count = KMP(s, maxString);
         printf("%s %d\n", maxString.c_str(), count);
@@ -95,7 +95,7 @@ void getLCS(string s){
 }
 
 int main(){
-    freopen("input.in", "r", stdin);
+    //freopen("input.in", "r", stdin);
     int n;
     cin >> n;
     string line;
