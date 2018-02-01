@@ -76,69 +76,6 @@ bool search(struct TrieNode *root, string key)
     return (pCrawl != NULL && pCrawl->isEndOfWord);
 }
  
-// // Driver
-// int main()
-// {
-//     // Input keys (use only 'a' through 'z'
-//     // and lower case)
-//     string keys[] = {"waldorf" };
-//     int n = sizeof(keys)/sizeof(keys[0]);
- 
-//     struct TrieNode *root = getNode();
- 
-//     // Construct trie
-//     for (int i = 0; i < n; i++)
-//         insert(root, keys[i]);
- 
-//     // Search for different keys
-//     // search(root, "the")? cout << "Yes\n" :
-//     //                      cout << "No\n";
-//     search(root, "waldo")? cout << "Yes\n" :
-//                            cout << "No\n";
-//     return 0;
-// }
-
-// int *grid;
-
-// int main(){
-//     freopen("input.in", "r", stdin);
-//     int testCases;
-//     cin >> testCases;
-//     cout << testCases << "\n";
-//     for (int l = 0; l < testCases; l++) {
-//         //create grid
-//         int n, m, k;
-//         cin >> n >> m ;
-//         grid = new int[n*m];
-//         for(int i = 0; i < n; i++){
-//             for(int j = 0; j < m; j++){
-//                 string c;
-//                 cin >> c;
-//                 cout << c << "\n";g
-//                 for(int k =  0; k < c.size(); k++ ){
-//                     grid(i,j) = tolower(c[k]);
-//                 }
-                
-//             }
-//         }
-
-//         // cin >> k;
-//         // cout << k;
-//         // vector<string> queries;
-//         // for (int i = 0; i < k; i++) {
-//         // 	string c;
-//         // 	cin >> c;
-//         // 	queries.push_back(c);
-//         // }
-//         // for (int i = 0; i < queries.size(); i++) {
-//         // 	cout << queries[i];
-//         // }
-//     	delete [] grid;
-//     }
-//     // return 0;
-// }
-
-
 string getVerticalDown(char** grid, int row, int col, int num_rows, int num_cols) {
 	char buffer[num_rows-row];
 	int x=0;
