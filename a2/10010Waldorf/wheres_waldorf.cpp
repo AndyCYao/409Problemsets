@@ -2,7 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <ctype.h>
-#include <bits/stdc++.h>
+//#include <bits/stdc++.h>
 #include <algorithm>
 #include <string> 
 using namespace std;
@@ -237,6 +237,7 @@ string getDiagonalLeftDown(char** grid, int row, int col, int num_rows, int num_
 // }
 
 int main(){
+	//freopen("input1.in", "r", stdin);
     int testCases;
     cin >> testCases;
     int billy_bob=testCases;
@@ -315,6 +316,7 @@ int main(){
 	    }
 	    if (testCases > 0) cout << endl << endl;
     }
+	cout << endl;
     return 0;
 }
 
