@@ -53,7 +53,7 @@ int main() {
 	
     while(probSize--) {
         cin >> n >> s;
-	cout << MinLex(s,n) << endl;
+	    cout << MinLex(s,n) << endl;
     }
     return 0;
 }
