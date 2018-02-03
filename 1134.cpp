@@ -49,11 +49,11 @@ int MinLex(const char *s, const int len)
 int main() {
     int input, n;
     char s[10000];
-    cin >> input;
+    cin >> probSize;
 	
-    while(input--) {
+    while(probSize--) {
         cin >> n >> s;
-		cout << MinLex(s,n) << endl;
+	cout << MinLex(s,n) << endl;
     }
     return 0;
 }
