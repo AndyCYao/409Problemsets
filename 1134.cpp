@@ -47,7 +47,7 @@ int MinLex(const char *s, const int len)
     return a;
 }
 int main() {
-    int input, n;
+    int probSize, n;
     char s[10000];
     cin >> probSize;
 	
