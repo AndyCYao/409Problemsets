@@ -47,13 +47,13 @@ int MinLex(const char *s, const int len)
     return a;
 }
 int main() {
-    int probSize, n;
-    char s[10000];
-    cin >> probSize;
+    int input, n;
+    char s[100000];
+    cin >> input;
 	
-    while(probSize--) {
+    while(input--) {
         cin >> n >> s;
-	    cout << MinLex(s,n) << endl;
+		cout << MinLex(s,n) << endl;
     }
     return 0;
 }
