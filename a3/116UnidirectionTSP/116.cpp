@@ -2,9 +2,10 @@
 #include <vector>
 using namespace std;
 vector< vector<int> > travelMap;
+vector< vector<int> > path;
 vector< vector<int> > DP;
 int row, col;
-#define MAX 2147483647 // 2^31 -1 
+#define INT_MAX 2147483647 // 2^31 -1 
 /*
 Use Dynamic program to solve this question. 
 
@@ -19,76 +20,50 @@ to get the path, we go to the last column, and get min value.
 then check the min value in previous col. and print that out. thats the path.
 */
 
-// handle the out of bound situations
-int prevPos(int r){
-    
-    if(r >= 0 && r < row){
-        return r;
-    }
-    if(r == -1) return row - 1;
-    if(r == row) return 0;
-}
-
 void getLeastPath(){
     DP.clear();
-    DP.assign(row, vector<int>(col));
+    DP.assign(row, vector<int>(col, INT_MAX));
+    path.clear();
+    path.assign(row, vector<int>(col, INT_MAX));
     // get base case
     for(int r = 0; r < row; r++) DP[r][0] = travelMap[r][0];
 
     for(int c = 1; c < col; c++){
         for(int r = 0; r < row ; r++){
-            int p1, p2, p3;
-            if(row < 3){ // we do this to maintain lexigraphyical ordering. 
-                p1 = DP[r][c - 1];
-                p2 = DP[prevPos(r+1)][c - 1];
-                p3 = p2;
-            }else{
-                p1 = DP[prevPos(r-1)][c - 1];
-                p2 = DP[r][c - 1];
-                p3 = DP[prevPos(r+1)][c - 1];
+            int tempIdx, tempVal,  cost;
+            cost = INT_MAX;
+            for(int k = -1 ; k <= 1; k++){
+                tempIdx = (r + k + row) % row;
+                tempVal = DP[tempIdx][c - 1];
+                if(tempVal < cost || (tempVal == cost && tempIdx < path[r][c - 1])){
+                    cost       = tempVal;
+                    DP[r][c]   = travelMap[r][c] + tempVal;
+                    path[r][c - 1] = tempIdx;
+                }
             }
-            int minVal = min({p1 , p2, p3});
-            DP[r][c] = travelMap[r][c] + minVal;
         }
     }
     // once DP is generated, now we can find the min cost by checking 
     // the last column. 
     // then we need to retrace the path, which takes linear time
-    int cost, retracePt;
-    cost = MAX;
+    int bestCost, retracePt;
+    bestCost = INT_MAX;
     for(int r = 0; r< row; r++){
-        if (DP[r][col - 1] < cost) {
-            cost = DP[r][col - 1];
+        if (DP[r][col - 1] < bestCost) {
+            bestCost = DP[r][col - 1];
             retracePt = r;
         } 
     }
 
-    vector<int> path;
-    path.push_back(retracePt + 1);
-    for(int c = col - 2; c >=0; c--){ // - 2 because we already know last col
-        int p1, p2, p3, temp, idx;
-        
-        if(row < 3){ // we do this to maintain lexgraphyical ordering. 
-            p1 = DP[retracePt][c];
-            p2 = DP[prevPos(retracePt-1)][c];
-            p3 = p2;
-            temp = (p1 <= p2) ? retracePt: prevPos(retracePt - 1);
-            idx  = (DP[temp][c] <= p3) ? temp : prevPos(retracePt+1);            
-        }else{
-            p1 = DP[prevPos(retracePt-1)][c];
-            p2 = DP[retracePt][c];
-            p3 = DP[prevPos(retracePt+1)][c];
-            temp = (p1 <= p2) ? prevPos(retracePt - 1): retracePt;
-            idx  = (DP[temp][c] <= p3) ? temp : prevPos(retracePt+1);
-        }
-        retracePt = idx;
-        path.push_back(idx + 1);
+    int printPath[col];
+    printPath[col - 1] = retracePt + 1;
+    for(int c = col - 2; c >= 0 ; c--){
+        retracePt = path[retracePt][c];
+        //cout << retracePt + 1;
+        printPath[c] = retracePt + 1;
     }
-
-    for(vector<int>::reverse_iterator it = path.rbegin(); it != path.rend(); it++){
-        cout << *it << " " ;
-    }
-    cout << "\n" << cost << endl;
+    for(int i = 0; i < col; i++) cout << printPath[i] << " " ;
+    cout << "\n" << bestCost << endl;
 }
 
 int main(){
@@ -109,4 +84,5 @@ int main(){
     // solve for DP 
     getLeastPath();
     }
+    return 0;
 }
