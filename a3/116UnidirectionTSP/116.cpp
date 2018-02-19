@@ -4,7 +4,7 @@ using namespace std;
 vector< vector<int> > travelMap;
 vector< vector<int> > DP;
 int row, col;
-#define MAX  2^31
+#define MAX 2147483647 // 2^31 -1 
 /*
 Use Dynamic program to solve this question. 
 
@@ -21,6 +21,7 @@ then check the min value in previous col. and print that out. thats the path.
 
 // handle the out of bound situations
 int prevPos(int r){
+    
     if(r >= 0 && r < row){
         return r;
     }
@@ -36,11 +37,17 @@ void getLeastPath(){
 
     for(int c = 1; c < col; c++){
         for(int r = 0; r < row ; r++){
-            int opt1, opt2, opt3;
-            opt3 = DP[prevPos(r+1)][c - 1];
-            opt2 = DP[r][c - 1];
-            opt1 = DP[prevPos(r-1)][c - 1];
-            int minVal = min({opt1 , opt2, opt3});
+            int p1, p2, p3;
+            if(row < 3){ // we do this to maintain lexigraphyical ordering. 
+                p1 = DP[r][c - 1];
+                p2 = DP[prevPos(r+1)][c - 1];
+                p3 = p2;
+            }else{
+                p1 = DP[prevPos(r-1)][c - 1];
+                p2 = DP[r][c - 1];
+                p3 = DP[prevPos(r+1)][c - 1];
+            }
+            int minVal = min({p1 , p2, p3});
             DP[r][c] = travelMap[r][c] + minVal;
         }
     }
@@ -59,12 +66,21 @@ void getLeastPath(){
     vector<int> path;
     path.push_back(retracePt + 1);
     for(int c = col - 2; c >=0; c--){ // - 2 because we already know last col
-        int p1, p2, p3;
-        p1 = DP[prevPos(retracePt-1)][c];
-        p2 = DP[retracePt][c];
-        p3 = DP[prevPos(retracePt+1)][c];
-        int temp = (p1 <= p2) ? prevPos(retracePt - 1): retracePt;
-        int idx  = (DP[temp][c] <= p3) ? temp : prevPos(retracePt+1);
+        int p1, p2, p3, temp, idx;
+        
+        if(row < 3){ // we do this to maintain lexgraphyical ordering. 
+            p1 = DP[retracePt][c];
+            p2 = DP[prevPos(retracePt-1)][c];
+            p3 = p2;
+            temp = (p1 <= p2) ? retracePt: prevPos(retracePt - 1);
+            idx  = (DP[temp][c] <= p3) ? temp : prevPos(retracePt+1);            
+        }else{
+            p1 = DP[prevPos(retracePt-1)][c];
+            p2 = DP[retracePt][c];
+            p3 = DP[prevPos(retracePt+1)][c];
+            temp = (p1 <= p2) ? prevPos(retracePt - 1): retracePt;
+            idx  = (DP[temp][c] <= p3) ? temp : prevPos(retracePt+1);
+        }
         retracePt = idx;
         path.push_back(idx + 1);
     }
