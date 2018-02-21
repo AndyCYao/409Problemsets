@@ -97,3 +97,4 @@ int main(){
         cout << DirtyHarry[len] << endl;
     }
 }
+
