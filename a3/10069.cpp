@@ -1,3 +1,6 @@
+// Author: Ionwyn Sean 301267286 isean
+// Accepted	C++11	0.010s	2018-02-21 05:03:26
+
 #include <iostream>
 #include <cstring>
 #include <algorithm>        // std::max()
@@ -15,6 +18,48 @@ using namespace std;
     
     Output the last element of the array.
 */
+
+void add(char s1[], char s2[], char res[]){
+    int l1 = strlen(s1);
+    int l2 = strlen(s2);
+    int reslen = max(l1,l2) + 1;
+    int i, j, k, c, tmp;
+    
+    for(int i=0; i < reslen; i++)
+        res[i]='0';
+        
+    res[reslen]='\0';
+    
+    for(i = l1-1,
+        j = l2-1,
+        k = reslen-1,
+        c = tmp = 0;
+        i>=0||j>=0;
+        k--){
+        tmp=0;
+        if(i>=0)
+            tmp+=s1[i--]-'0';
+        if(j>=0)
+            tmp+=s2[j--]-'0';
+        
+        tmp += c;
+        
+        if(tmp >= 10) {
+            c=1;
+            tmp -=10;
+        }
+        else
+            c=0;
+            
+        res[k] = tmp + '0';
+    }
+    
+    res[0]='0' + c;
+    
+    if(res[0] == '0')
+        for(int i=0; i < reslen;i++)
+            res[i]=res[i+1];
+}
 
 int main(){
     int n;
