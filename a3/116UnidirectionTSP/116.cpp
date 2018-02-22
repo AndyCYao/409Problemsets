@@ -1,9 +1,9 @@
 #include <iostream>
 #include <vector>
 using namespace std;
-vector< vector<int> > travelMap;
-vector< vector<int> > path;
-vector< vector<int> > DP;
+int travelMap[10][100];
+int path[10][100];
+int DP[10][100];
 int row, col;
 #define INT_MAX 2147483647 // 2^31 -1 
 /*
@@ -21,10 +21,6 @@ then check the min value in previous col. and print that out. thats the path.
 */
 
 void getLeastPath(){
-    DP.clear();
-    DP.assign(row, vector<int>(col, INT_MAX));
-    path.clear();
-    path.assign(row, vector<int>(col, INT_MAX));
     // get base case
     for(int r = 0; r < row; r++) DP[r][0] = travelMap[r][0];
 
@@ -59,7 +55,6 @@ void getLeastPath(){
     printPath[col - 1] = retracePt + 1;
     for(int c = col - 2; c >= 0 ; c--){
         retracePt = path[retracePt][c];
-        //cout << retracePt + 1;
         printPath[c] = retracePt + 1;
     }
     for(int i = 0; i < col; i++) cout << printPath[i] << " " ;
@@ -69,16 +64,10 @@ void getLeastPath(){
 int main(){
     freopen("input.in","r",stdin);
     while(cin >> row >> col){
-        travelMap.clear();
-        travelMap.assign(row, vector<int> (col));
-        for(int i = 0; i < row; i ++){
-            vector<int> rowVec;
-            for(int j = 0; j < col; j++){
-                int node;
-                cin >> node;
-                rowVec.push_back(node);
+        for(int i = row - 1; i >= 0; i --){
+            for(int j = col - 1; j >= 0; j--){
+                cin >> travelMap[i][j];
             }
-            travelMap[i] = rowVec;
         }
 
     // solve for DP 
