@@ -9,7 +9,6 @@ int row, col;
 /*
 Use Dynamic program to solve this question. 
 
-
 let A[i,j] hold the minimum path up to point row i, and col j. 
 A[i, j] = cost(i,j) + min(A[i, j-1], A[i+1,j-1], A[i-1, j-1])
 
@@ -64,8 +63,8 @@ void getLeastPath(){
 int main(){
     freopen("input.in","r",stdin);
     while(cin >> row >> col){
-        for(int i = row - 1; i >= 0; i --){
-            for(int j = col - 1; j >= 0; j--){
+        for(int i = 0; i < row ; i ++){
+            for(int j = 0; j < col; j++){
                 cin >> travelMap[i][j];
             }
         }
