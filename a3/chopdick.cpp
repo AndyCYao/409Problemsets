@@ -1,9 +1,6 @@
 #include <algorithm>        // std::sort
 #include <iostream>
 
-// This is infinity
-#define inf std::numeric_limits<int>::max();
-
 // Line of thought (Rants)
 /*
 Observations:
@@ -18,33 +15,40 @@ As in classical Dynamic Programming problems, we have recursive function (this i
 
 */
 
+// This is infinity
+#define inf std::numeric_limits<int>::max();
+
 using namespace std;
 
-// Too lazy caring about pointers and all that crap so here's global variable to rescue...
 int x, m, ans;
-int a[6666], dirtyHarry[2][6666];
+int a[5005], dirtyHarry[2][5005];
 
-void shoot()
+void solve()
 {
     int n,p=0;
     
-    // 
     for(int i=0; i<=x; i++)
         dirtyHarry[0][i]=0;
         
     for(int i=1; i<=m; i++)
     {
         for(int j=0; j<3*i; j++)
-            dp[p][j]=inf;
+            dirtyHarry[p^1][j]=inf;
             
         for(int j=3*i; j<=x; j++)
         {
-              dirtyHarry[p][j]=dirtyHarry[p][j-1];
+            dirtyHarry[p^1][j]=dirtyHarry[p^1][j-1];
               
-              if(j >= 3*i)
-                  dirtyHarry[p][j]=min(dirtyHarry[p][j-2]+(a[j]-a[j-1])*(a[j]-a[j-1]), dirtyHarry[p][j]);
+            if(j >= 3*i)
+                dirtyHarry[p^1][j]=min(dirtyHarry[p][j-2]+(a[j]-a[j-1])*(a[j]-a[j-1]),dirtyHarry[p^1][j]);
         }
+        // This is just a trick to change indices with ease.
+        p=p^1;
     }
+    ans=inf;
+    
+    for(int j=3*m;j<=x;j++)
+        ans=min(dirtyHarry[p][j], ans);
 }
 
 // Just my style of doing one-line functions.
@@ -63,7 +67,7 @@ int main()
             cin >> a[i];
         }
         sort(a+1, a+x+1, cmp);
-        shoot();
+        solve();
         cout << ans << endl;
     }
     return 0;
