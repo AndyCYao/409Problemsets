@@ -1,3 +1,6 @@
+// Author: Ionwyn Sean 301267286 isean
+// Verdict Accepted	C++11	0.060	2018-02-24 03:09:39 (in the nick of time! ;)
+
 #include <algorithm>        // std::sort
 #include <iostream>
 
