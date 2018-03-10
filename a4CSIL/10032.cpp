@@ -1,8 +1,7 @@
 #include <iostream>
-#include <cstring>
 #include <algorithm>
 #include <numeric>
-#include <cmath>
+#include <cstring>
 using namespace std;
 
 int N;
@@ -12,11 +11,8 @@ long long dp[450 * 100 + 5];
 void solve()
 {
     int sum = accumulate(W + 1, W + N + 1, 0); // gets you the sum of all the weights in W
-    
-    // If (dp[i] << j) & 1 is 1, that means it is possible
-    // to select j out of the N people so that the sum of
-    // their weight is i.
-    memset(dp, 0, sizeof(dp));
+
+    memset(dp, 0, sizeof(dp)); // copies 0 to all of dp
     dp[0] = 1 << 0;
         
     for (int i = 1; i <= N; ++i)
@@ -26,23 +22,28 @@ void solve()
     
     int minDiff = 450 * 100;
     int teamOneWeight = 0, teamTwoWeight = 0;
-    for (int i = 0; i <= sum; ++i)
-        if (dp[i] & (1ll << (N / 2)))
+    long long teamSize = 1ll << (N / 2);
+    for (int i = 0; i <= sum; ++i){
+        // if dp[i] & teamSize is true (AKA is 1), this means its possible to get the weight i, using half the people
+        // this is usin bit AND comparison
+        if (dp[i] & teamSize)
         {
-            int diff = abs(i - (sum - i));
-            if (diff < minDiff)
+            int tempDiff = i - (sum - i);
+            int diff = abs(tempDiff);
+            if (diff < minDiff) // relaxes the condition , this is our new difference. 
             {
                 minDiff = diff;
                 teamOneWeight = min(i, sum - i);
                 teamTwoWeight = max(i, sum - i);
             }
         }
+    }
     cout << teamOneWeight << " " << teamTwoWeight << endl;
 }
 
 int main()
 {
-    freopen("input.in","r", stdin);
+    //freopen("input.in","r", stdin);
     int T, Case = 0;
     cin >> T;
     while ( T-- )
