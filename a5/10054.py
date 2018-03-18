@@ -1,5 +1,5 @@
 from sys import stdin
-from collections import defaultdict
+from collections import defaultdict, deque
 
 # "Colors are represented by integers from 1 to 50"
 MAX_COLORS = 50
@@ -35,8 +35,37 @@ def buildGraph(beads):
         if v%2 != 0:
             return None
 
-    # Next task:
-        "Use Fleury's Algorithm to Construct the Graph"
+    # Create necklace using Fleury's algorithm
+    def get_next_bead(color):
+        """ """
+        s_color, s_degree = 0, 0
+        for col, deg in graphTrix[color].items():
+            if deg > s_degree:
+                s_color, s_degree = col, deg
+
+        if s_degree>0:
+            graphTrix[color][s_color] -= 1
+            graphTrix[s_color][color] -= 1
+            return (color, s_color)
+        else:
+            return None
+
+    # Start construction
+    nxt = get_next_bead(beads[0][1])
+    necklace = deque([nxt])
+
+    while True:
+        nxt = get_next_bead(necklace[-1][1])
+        if nxt:
+            necklace.append(nxt)
+        elif len(beads) != len(necklace):
+            # Created a closed cycle.move last segment to the start
+            prev = necklace.pop()
+            necklace.appendleft(prev)
+        else:
+            break
+
+    return necklace
 
 
 if __name__ == '__main__':
@@ -54,6 +83,12 @@ if __name__ == '__main__':
             # So the idea is to use as few print statements as possible.
             freddyKruger = ""
             for b in necklace:
-                # gather the answers in tuple form
+                freddyKruger += "{} {}\n".format(b[0], b[1])
         else:
             freddyKruger = "some beads may be lost\n"
+
+        if i+1 == n:
+            print(freddyKruger[:-1])
+
+        else:
+            print(freddyKruger)
