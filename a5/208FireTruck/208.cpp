@@ -1,19 +1,29 @@
 #include <iostream>
 #include <vector>
 #include <algorithm> 
+#include<cstring>
 using namespace std;
 
-// typedef pair<int, int> PII;
-// vector < vector<PII> > adj; // max 21 corners
 vector< vector<int> > adj;
 int n , endNode, numberOfPaths;
 vector<int> path;
-int visited[21] = {0};
+const int MAX_CORNER = 21;
+int visited[MAX_CORNER], isReachable[MAX_CORNER];
 
 void printPath(){
     cout << path[0];
     for(int i = 1; i < path.size(); i++) cout << " " << path[i];
     cout << endl;
+}
+
+void DFS_Preprocess(int nextNode){
+    isReachable[nextNode] = 1;
+    for(int i = 0; i < adj[nextNode].size(); i++){
+        int neighbor = adj[nextNode][i];
+        if(!isReachable[neighbor] ){
+            DFS_Preprocess(neighbor);
+        }
+    }
 }
 
 void DFS(int v, int visited[]){
@@ -25,7 +35,6 @@ void DFS(int v, int visited[]){
         return;
     }
     visited[v] = true;
-    sort(adj[v].begin(),adj[v].end());
     for(vector< int > :: iterator i = adj[v].begin(); i !=adj[v].end(); i++){
         int currentNode = *i;
         if(!visited[currentNode]){
@@ -37,23 +46,14 @@ void DFS(int v, int visited[]){
     path.pop_back();    // pop here because we are rewinding 
 }
 
-void solve(){
-    numberOfPaths = 0;
-    int visited[21] = {0};
-    path.clear(); path.push_back(1);
-    DFS(1, visited);
-    cout << "There are " << numberOfPaths << " routes from the firestation to streetcorner " << endNode << ".\n";
-}
-
 int main(){
     //freopen("input.in", "r",stdin);
-
     n = 1;
     while(cin >> endNode){
         cout << "CASE "<< n << ":" << endl;
         n++;
         adj.clear();
-        adj.resize(21);
+        adj.resize(MAX_CORNER);
         int a, b;
         cin >> a >> b ;
         while(a != 0 && b != 0){
@@ -61,7 +61,18 @@ int main(){
             adj[b].push_back(a);
             cin >> a >> b;
         }
-        solve();
+        for(int i = 0 ; i < MAX_CORNER; i++){
+            sort(adj[i].begin(),adj[i].end());
+        }
+        numberOfPaths = 0;
+        memset(isReachable,0,sizeof(isReachable));
+        DFS_Preprocess(endNode); // preprocess check if a node is reachable first before solving
+        if(isReachable[1]){
+            memset(visited,0,sizeof(visited));
+            path.clear(); path.push_back(1);
+            DFS(1, visited);
+        }
+        cout << "There are " << numberOfPaths << " routes from the firestation to streetcorner " << endNode << ".\n";
     }
     return 0;
 }
