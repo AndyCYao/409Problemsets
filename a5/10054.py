@@ -21,7 +21,7 @@ def buildGraph(beads):
     G, G is Eulerian if and only if every vertex has even degree. """
 
     # graphTrix... short for graph Matrix hehehe
-    graphTrix = [defaultdict(int) for i in range(MAX_COLORS)]
+    graphTrix = [defaultdict(int) for _ in range(MAX_COLORS)]
     degree = defaultdict(int)
     for b in beads:
         graphTrix[b[0]][b[1]] += 1
