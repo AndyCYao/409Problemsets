@@ -1,21 +1,36 @@
 #include <iostream>
-#include <algorithm>
 
 using namespace std;
 
+const int maxNum = 65000;
+bool composite[maxNum], carmichael[maxNum];
+
 int main()
 {
-    int n;
-    int carmichael[] = {561, 1105, 1729, 2465, 2821, 6601, 8911, 10585, 15841, 29341, 41041, 46657, 52633, 62745, 63973};
-    
-    while (cin >> n, n !=0)
+    // Calculated using Korselt's criterion
+    for (int i = 3; i < maxNum; i += 2)
+        carmichael[i] = true;
+
+    for (int i = 3; i < maxNum; i += 2)
     {
-        bool exists = std::any_of(std::begin(carmichael), std::end(carmichael), [&](int i) {return i == n;});
-        
-        if (exists)
+        if (!composite[i])
+        {
+            carmichael[i] = false;
+            for (int j = 3 * i; j < maxNum; j += 2*i)
+            {
+                composite[j] = true;
+                if ((j / i) % i == 0 || (j - 1) % (i - 1) != 0) { carmichael[j] = false; }
+            }
+        }
+    }
+
+    // We've calculated all Carmichael numbers from step above.  Now we just access it.
+    int n;
+    while (cin >> n, n)
+    {
+        if (carmichael[n])
             cout << "The number " << n << " is a Carmichael number." << endl;
         else
             cout << n << " is normal." << endl;
     }
-    return 0;
 }
