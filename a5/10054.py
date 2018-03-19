@@ -2,7 +2,7 @@ from sys import stdin
 from collections import defaultdict, deque
 
 # "Colors are represented by integers from 1 to 50"
-MAX_COLORS = 50
+MAX_COLORS = 51
 
 def load_num():
     return int(stdin.readline())
@@ -36,30 +36,27 @@ def buildGraph(beads):
             return None
 
     # Create necklace using Fleury's algorithm
-    def get_next_bead(color):
-        """ """
-        s_color, s_degree = 0, 0
+    def getNextBead(color):
+        vColor, vDegree = 0, 0
         for col, deg in graphTrix[color].items():
-            if deg > s_degree:
-                s_color, s_degree = col, deg
+            if deg > vDegree:
+                vColor, vDegree = col, deg
 
-        if s_degree>0:
-            graphTrix[color][s_color] -= 1
-            graphTrix[s_color][color] -= 1
-            return (color, s_color)
+        if vDegree>0:
+            graphTrix[color][vColor] -= 1
+            graphTrix[vColor][color] -= 1
+            return (color, vColor)
         else:
             return None
 
-    # Start construction
-    nxt = get_next_bead(beads[0][1])
+    nxt = getNextBead(beads[0][1])
     necklace = deque([nxt])
 
     while True:
-        nxt = get_next_bead(necklace[-1][1])
+        nxt = getNextBead(necklace[-1][1])
         if nxt:
             necklace.append(nxt)
         elif len(beads) != len(necklace):
-            # Created a closed cycle.move last segment to the start
             prev = necklace.pop()
             necklace.appendleft(prev)
         else:
