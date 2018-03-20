@@ -1,6 +1,7 @@
 from sys import stdin
 import math
 
+stdin = open("input.in")
 
 # Defining boilerplate code for Python Submission
 def load_num():
@@ -27,9 +28,12 @@ def load_instance_2(d):
 # Compiler looks at this first, as in main() in c++.
 # This, for Python at least, makes the compiler easy to detect EOF
 if __name__ == '__main__':
+    
     ney = load_num()
     # While there is problem to solve
     for r in range(ney):
+        # deliberatly skip a line, every case starts with a skip line
+        stdin.readline()
         n = load_num()
         Free = [0]*(n+2)
         d = [0]*(n+2)
